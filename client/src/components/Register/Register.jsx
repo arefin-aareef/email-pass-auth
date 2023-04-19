@@ -19,7 +19,7 @@ const Register = () => {
         const email = event.target.email.value;
         const password = event.target.password.value;
         console.log(email, password);
-
+        // regular expression
         if(!/(?=.*[A-Z])/.test(password)){
             setError('Add at least one uppercase letter')
             return;
