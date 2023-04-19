@@ -1,5 +1,10 @@
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
+import app from "../../Firebase/firebase.config";
+import { Link } from "react-router-dom";
+
+const auth = getAuth(app)
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -31,8 +36,24 @@ const Login = () => {
         return
     }
 
-    setUsername('')
-    setPassword('')
+    // setUsername('')
+    // setPassword('')
+
+    signInWithEmailAndPassword(auth, username, password)
+    .then(result => {
+        const loggedUser = result.user;
+        console.log(loggedUser);
+        if(!loggedUser.emailVerified){
+            alert('Can not login without verification ')
+        }
+        else {
+            setSuccess("Login Successful")
+        }
+        setError('')
+    })
+    .catch(error => {
+        setError(error.message)
+    })
 
   };
   return (
@@ -72,7 +93,7 @@ const Login = () => {
           <Button variant="primary" type="submit">
             Submit
           </Button>
-
+            <p><small>New here? Click to <Link to="/register">Register</Link> </small></p>
         </Form>
       </div>
     </div>
