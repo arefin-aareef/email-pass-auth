@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, updateProfile } from "firebase/auth";
 import app from '../../Firebase/firebase.config';
 import { Link } from "react-router-dom";
 
@@ -19,7 +19,8 @@ const Register = () => {
         setError('');
         const email = event.target.email.value;
         const password = event.target.password.value;
-        console.log(email, password);
+        const name = event.target.name.value;
+        console.log(name, email, password);
         // regular expression
         if(!/(?=.*[A-Z])/.test(password)){
             setError('Add at least one uppercase letter')
@@ -33,6 +34,7 @@ const Register = () => {
             event.target.reset();
             setSuccess('User Created Successfully')
             sendVerification(result.user);
+            updateUserData(result.user, name)
         })
         .catch(error => {
             console.log(error.message);
@@ -44,8 +46,19 @@ const Register = () => {
     const sendVerification = (user) => {
         sendEmailVerification(user)
         .then(result => {
-            console.log(result);
             alert('Verify email')
+        })
+    }
+
+    const updateUserData = (user, name) => {
+        updateProfile(user, {
+            displayName: name
+        })
+        .then(() => {
+            console.log('user name updated');
+        })
+        .catch(error => {
+            setError(error.message)
         })
     }
 
@@ -62,6 +75,8 @@ const Register = () => {
         <div className='w-50 mx-auto border'>
             <h3>Please Register</h3>
             <form onSubmit={handleSubmit}>
+                <input className='w-50 mb-4 rounded ps-2' type="text" name="name" id="name" placeholder='Your Name' required />
+                <br />
                 <input className='w-50 mb-4 rounded ps-2' onChange={handleEmailChange} type="email" name="email" id="email" placeholder='Your Email' required />
                 <br />
                 <input className='w-50 mb-4 rounded ps-2' onBlur={handlePasswordBlur} type="password" name="password" id="password" placeholder='Your Password' required />

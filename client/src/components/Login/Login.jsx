@@ -1,5 +1,5 @@
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
+import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useRef, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import app from "../../Firebase/firebase.config";
 import { Link } from "react-router-dom";
@@ -11,6 +11,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const emailRef = useRef()
 
   const handleUsernameChange = (event) => {
     setUsername(event.target.value);
@@ -55,7 +57,24 @@ const Login = () => {
         setError(error.message)
     })
 
-  };
+  }
+
+  const handleResetPassword = event => {
+    const email = emailRef.current.value
+    if (!email){
+        alert('provide email address to reset')
+        return
+    }
+    sendPasswordResetEmail(auth, username)
+    .then( () => {
+        alert('Plz Check your email')
+    })
+    .catch(error => {
+        console.log(error);
+        setError(error.message)
+    })
+  }
+
   return (
     <div>
       <h3 className="text-center">Please Login Here!</h3>
@@ -69,6 +88,7 @@ const Login = () => {
               value={username}
               onChange={handleUsernameChange}
               required
+              ref={emailRef}
             />
           </Form.Group>
 
@@ -93,7 +113,8 @@ const Login = () => {
           <Button variant="primary" type="submit">
             Submit
           </Button>
-            <p><small>New here? Click to <Link to="/register">Register</Link> </small></p>
+          <p>Forget password? <button onClick={handleResetPassword} className="btn btn-link">Reset</button></p>
+          <p><small>New here? Click to <Link to="/register">Register</Link> </small></p>
         </Form>
       </div>
     </div>
